@@ -40,9 +40,11 @@ def saml_login(request):
             request.session['samlNameId'] = auth.get_nameid()
             request.session['samlSessionIndex'] = auth.get_session_index()
             attributes = request.session['samlUserdata'].items()
-            user = authenticate(request=request)
+            user, created = authenticate(request=request)
             login(request, user)
-            if hasattr(settings, 'SAML_REDIRECT'):
+            if created and hasattr(settings, 'SAML_REDIRECT_CREATED'):
+                return HttpResponseRedirect(settings.SAML_REDIRECT_CREATED)
+            elif hasattr(settings, 'SAML_REDIRECT'):
                 return HttpResponseRedirect(settings.SAML_REDIRECT)
             elif 'RelayState' in req['post_data'] and OneLogin_Saml2_Utils.get_self_url(req) != req['post_data']['RelayState']:
                 return HttpResponseRedirect(auth.redirect_to(req['post_data']['RelayState']))

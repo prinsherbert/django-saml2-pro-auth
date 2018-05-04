@@ -65,11 +65,11 @@ class Backend(object): # pragma: no cover
         }
 
         if sync_attributes:
-            user, _ = User.objects.update_or_create(defaults=final_map, **lookup_map)
+            user, created = User.objects.update_or_create(defaults=final_map, **lookup_map)
         else:
-            user, _ = User.objects.get_or_create(defaults=final_map, **lookup_map)
+            user, created = User.objects.get_or_create(defaults=final_map, **lookup_map)
 
-        return user
+        return user, created
 
     def get_user(self, user_id):
         User = get_user_model()

@@ -1,4 +1,4 @@
-VERSION = (0, 1, 'b1')
+VERSION = (0, 2, 'b1')
 
 __title__ = 'django-saml2-pro-auth'
 __version_info__ = VERSION
