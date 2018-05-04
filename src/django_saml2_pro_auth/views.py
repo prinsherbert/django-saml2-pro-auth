@@ -40,7 +40,8 @@ def saml_login(request):
             request.session['samlNameId'] = auth.get_nameid()
             request.session['samlSessionIndex'] = auth.get_session_index()
             attributes = request.session['samlUserdata'].items()
-            user, created = authenticate(request=request)
+            user = authenticate(request=request)
+            created = request.session['samlCreatedNewUser']
             login(request, user)
             if created and hasattr(settings, 'SAML_REDIRECT_CREATED'):
                 return HttpResponseRedirect(settings.SAML_REDIRECT_CREATED)
