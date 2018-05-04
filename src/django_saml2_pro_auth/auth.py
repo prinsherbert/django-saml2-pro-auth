@@ -69,8 +69,7 @@ class Backend(object): # pragma: no cover
         else:
             user, created = User.objects.get_or_create(defaults=final_map, **lookup_map)
         
-        if created:
-            request.session['samlCreatedNewUser'] = created
+        request.session['samlCreatedNewUser'] = created
             
         return user
 
