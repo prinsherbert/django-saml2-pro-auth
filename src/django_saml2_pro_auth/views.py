@@ -42,15 +42,15 @@ def saml_login(request):
             attributes = request.session['samlUserdata'].items()
             user = authenticate(request=request)
             created = request.session.get('samlCreatedNewUser', False)
-            
             if user is None:
                 if hasattr(settings, 'SAML_FAIL_REDIRECT'):
                     return HttpResponseRedirect(settings.SAML_FAIL_REDIRECT)
                 raise SAMLError('FAILED TO AUTHENTICATE SAML USER WITH BACKEND')
             login(request, user)
-            if created and hasattr(settings, 'SAML_REDIRECT_CREATED'):
+
+            if hasattr(settings, 'SAML_REDIRECT_CREATED'):
                 return HttpResponseRedirect(settings.SAML_REDIRECT_CREATED)
-            elif hasattr(settings, 'SAML_REDIRECT'):
+            elif created hasattr(settings, 'SAML_REDIRECT'):
                 return HttpResponseRedirect(settings.SAML_REDIRECT)
             elif 'RelayState' in req['post_data'] and OneLogin_Saml2_Utils.get_self_url(req) != req['post_data']['RelayState']:
                 return HttpResponseRedirect(auth.redirect_to(req['post_data']['RelayState']))
