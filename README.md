@@ -5,6 +5,8 @@
 
 ![Python versions](https://img.shields.io/pypi/pyversions/django-saml2-pro-auth.svg) [![Django versions](https://img.shields.io/badge/django-1.8%2C%201.10%2C%201.11-44B78B.svg)](https://pypi.org/project/django-saml2-pro-auth/)
 
+[![Downloads](http://pepy.tech/badge/django-saml2-pro-auth)](http://pepy.tech/project/django-saml2-pro-auth)
+
 
 # django-saml2-pro-auth
 SAML2 authentication backend for Django
@@ -28,13 +30,13 @@ You'll want to find the equivalent on your OS of choice.
 
 **Python 2**
 
-```
+```bash
   pip install django-saml2-pro-auth
 ```
 
 **Python 3**
 
-```
+```bash
   pip3 install django-saml2-pro-auth
 ```
 
@@ -52,6 +54,8 @@ AUTHENTICATION_BACKENDS = [
 SAML_ROUTE = 'sso/saml/'
 
 SAML_REDIRECT = '/'
+
+SAML_FAIL_REDIRECT = '/login_failed'
 
 SAML_USERS_MAP = [{
     "MyProvider" : {
@@ -164,6 +168,8 @@ So first import the urls via `import django_saml2_pro_auth.urls as saml_urls` (i
 
 **SAML_REDIRECT (optional, default=None):** This tells the auth backend where to redirect users after they've logged in via the IdP. **NOTE**: This is not needed for _most_ users. Order of precedence is: SAML_REDIRECT value (if defined), RELAY_STATE provided in the SAML response, and the fallback is simply to go to the root path of your application.
 
+**SAML_FAIL_REDIRECT (optional, default=None):** This tells the auth backend where to redirect when the SAML authentication fails on the Django side. When using the supplied backend this can happen when a user is marked with is_active=False in the Django DB while still being able to authenticate with the IdP. When SAML_FAIl_REDIRECT has not been set, a SAMLError is raised to avoid redirect loops.
+
 **SAML_USERS_MAP (required):** This is what makes it possible to map the attributes as they come from your IdP into attributes that are part of your User model in Django. There a few ways you can define this. The dict keys (the left-side) are the attributes as defined in YOUR User model, the dict values (the right-side) are the attributes as supplied by your IdP.
 
 ```python
@@ -219,6 +225,35 @@ Defaults to False
 
 ```python
 SAML_USERS_SYNC_ATTRIBUTES = True
+```
+
+
+**SAML_USERS_STRICT_MAPPING (optional):**
+Specifies if every user attribute defined in SAML_USER_MAP must be present
+in the saml response or not.
+
+Defaults to True
+
+```python
+SAML_USERS_STRICT_MAPPING = False
+```
+
+If set to False, you can optionally specify a default value in the "SAML_USER_MAP"
+dict and it will set the value when the attribute is not present in the IdP response object.
+
+Example default value setting
+
+```python
+# set default value for is_superuser and is_staff to False
+SAML_USERS_STRICT_MAPPING = False
+SAML_USERS_MAP = [{
+    "MyProvider" : {
+      "email": dict(key="email", index=0),
+      "username": dict(key="username", index=0),
+      "is_superuser": dict(key="is_superuser", index=0, default=False),
+      "is_staff": dict(key="is_staff", index=0, default=False)
+    }
+}]
 ```
 
 **SAML_PROVIDERS:** This is exactly the same spec as OneLogin's [python-saml and python3-saml packages](https://github.com/onelogin/python3-saml#settings). The big difference is here you supply a list of dicts where the top most key(s) must map 1:1 to the top most keys in `SAML_USERS_MAP`. Also, this package allows you to ref the cert/key files via `open()` calls. This is to allow those of you with multiple external customers to login to your platform with any N number of IdPs.
